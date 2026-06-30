@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Danh Sách Sản Phẩm - OutfitLab{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/danh_sach_san_pham.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="margin-top: 130px;">
+    <div class="row">
+
+        <!-- Nội dung chính - Full width -->
+        <div class="col-12">
+            
+            <!-- Thanh sắp xếp -->
+            <div class="d-flex justify-content-between align-items-center mb-4 pt-2 sort-bar">
+                <h4 class="mb-0 fw-bold">
+                    {% if q %}Kết quả cho "{{ q }}"{% else %}Tất cả sản phẩm{% endif %}
+                </h4>
+                
+                <select id="sortSelect" class="form-select" style="width: 240px;">
+                    <option value="">Phổ biến nhất</option>
+                    <option value="pho_bien">Phổ biến</option>
+                    <option value="moi_nhat">Mới nhất</option>
+                    <option value="ban_chay">Bán chạy</option>
+                    <option value="gia_thap">Giá thấp → cao</option>
+                    <option value="gia_cao">Giá cao → thấp</option>
+                </select>
+            </div>
+
+            <!-- Grid sản phẩm -->
+            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-4 g-4" id="productGrid">
+                {% include 'product_grid.html' %}
+            </div>
+
+            <div id="loading" class="text-center py-5 d-none">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2">Đang tải sản phẩm...</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/danh_sach_san_pham.js' %}"></script>
+{% endblock %}

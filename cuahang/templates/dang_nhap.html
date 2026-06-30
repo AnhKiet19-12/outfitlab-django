@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Đăng Nhập - Thời Trang VN{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dangnhap.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-form">
+        <h2 class="text-center mb-4">Đăng Nhập</h2>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" id="loginForm">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">Tên tài khoản</label>
+                <input type="text" name="username" class="form-control" required>
+            </div>
+            <div class="mb-3 position-relative">
+                <label class="form-label">Mật khẩu</label>
+                <input type="password" name="password" id="password" class="form-control" required>
+                <span class="toggle-password" onclick="togglePassword()">👁️</span>
+            </div>
+
+            <div class="d-flex justify-content-between mb-3">
+                <a href="{% url 'quen_mat_khau' %}" class="text-decoration-none text-primary">Quên mật khẩu?</a>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Đăng Nhập</button>
+        </form>
+
+        <p class="text-center mt-4">
+            Chưa có tài khoản? <a href="{% url 'dang_ky' %}" class="text-primary">Đăng ký ngay</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function togglePassword() {
+    const pwd = document.getElementById('password');
+    pwd.type = (pwd.type === 'password') ? 'text' : 'password';
+}
+
+function forgotPassword() {
+    Swal.fire({
+        title: 'Quên mật khẩu',
+        text: 'Tính năng đang được phát triển. Bạn có thể liên hệ admin hoặc thử lại sau.',
+        icon: 'info'
+    });
+}
+
+// Thông báo đăng nhập thành công
+{% if messages %}
+    {% for message in messages %}
+        {% if message.tags == 'success' or user.is_authenticated %}
+            Swal.fire({
+                icon: 'success',
+                title: 'Đăng nhập thành công!',
+                text: 'Chào mừng bạn quay trở lại!',
+                timer: 1800,
+                showConfirmButton: false
+            }).then(() => {
+                window.location.href = "{% url 'trang_chu' %}";
+            });
+        {% endif %}
+    {% endfor %}
+{% endif %}
+</script>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Đặt Lại Mật Khẩu{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dangnhap.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-form">
+        <h2 class="text-center mb-4">Đặt Lại Mật Khẩu Mới</h2>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" id="resetForm">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">Mật khẩu mới</label>
+                <input type="password" name="password" id="new_pass" class="form-control" required>
+                <small class="text-muted" id="passwordHelp"></small>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Xác nhận mật khẩu mới</label>
+                <input type="password" id="confirm_pass" class="form-control" required>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100 py-3 fw-bold">Đặt Lại Mật Khẩu</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.getElementById('resetForm').addEventListener('submit', function(e) {
+    const pass1 = document.getElementById('new_pass').value;
+    const pass2 = document.getElementById('confirm_pass').value;
+
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+    if (!regex.test(pass1)) {
+        e.preventDefault();
+        Swal.fire({
+            icon: 'error',
+            title: 'Mật khẩu yếu',
+            html: 'Mật khẩu phải có ít nhất 8 ký tự, bao gồm:<br>• 1 chữ hoa<br>• 1 chữ thường<br>• 1 số<br>• 1 ký tự đặc biệt (@$!%*?&)'
+        });
+        return;
+    }
+
+    if (pass1 !== pass2) {
+        e.preventDefault();
+        Swal.fire({
+            icon: 'error',
+            title: 'Mật khẩu không khớp!',
+        });
+    }
+});
+</script>
+{% endblock %}

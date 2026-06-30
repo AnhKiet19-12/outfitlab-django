@@ -1,0 +1,57 @@
+/* ====================== LỊCH SỬ HOÀN TIỀN CSS ====================== */
+
+.refund-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: all 0.4s ease;
+}
+
+.refund-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(236, 72, 153, 0.15);
+}
+
+.refund-header {
+    background: linear-gradient(135deg, #ec4899, #0ea5e9);
+    color: white;
+    padding: 18px 25px;
+}
+
+.status-badge {
+    font-size: 0.85rem;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-weight: 600;
+}
+
+.status-cho_xu_ly { background: #fef3c7; color: #d97706; }
+.status-dang_xu_ly { background: #dbeafe; color: #1e40af; }
+.status-da_hoan_tien { background: #d1fae5; color: #065f46; }
+.status-da_tu_choi { background: #fee2e2; color: #b91c1c; }
+
+.refund-body {
+    padding: 25px;
+}
+
+.refund-footer {
+    background: #f8fafc;
+    padding: 18px 25px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.image-preview {
+    max-height: 280px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.empty-state {
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}

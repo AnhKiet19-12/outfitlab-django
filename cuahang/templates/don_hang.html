@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Đơn Hàng Của Tôi - OutfitLab{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/don_hang.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="margin-top: 130px;">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary mb-0">
+            <i class="fas fa-truck"></i> Đơn Hàng Của Tôi
+        </h2>
+        
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" href="{% url 'don_hang' %}">
+                    <i class="fas fa-truck"></i> Đang xử lý
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'lich_su_don_hang' %}">
+                    <i class="fas fa-history"></i> Lịch sử đơn hàng
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    {% if don_chua_giao %}
+        <div class="row g-4" id="orderList">
+            {% for don in don_chua_giao %}
+            <div class="col-12">
+                <div class="order-card shadow-sm">
+                    <div class="order-header p-3 border-bottom">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong class="fs-5">Mã đơn: #{{ don.id }}</strong>
+                                <br>
+                                <small class="text-muted">{{ don.ngay_dat|date:"d/m/Y H:i" }}</small>
+                            </div>
+                            <span class="badge {% if don.trang_thai == 'da_xac_nhan' %}bg-success{% else %}bg-warning{% endif %}">
+                                {{ don.get_trang_thai_display|default:don.trang_thai }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="order-body p-3">
+                        {% for ct in don.chitietdonhang_set.all %}
+                        <div class="d-flex align-items-center gap-3 py-3 border-bottom">
+                            {% if ct.san_pham.hinh_anh %}
+                                <img src="{{ ct.san_pham.hinh_anh.url }}" 
+                                     class="order-small-img rounded" alt="">
+                            {% endif %}
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">{{ ct.san_pham.ten_san_pham }}</h6>
+                                <small class="text-muted">
+                                    SL: {{ ct.so_luong }} × {{ ct.gia|floatformat:0 }} ₫
+                                </small>
+                            </div>
+                            <div class="text-end">
+                                <strong class="text-danger">{{ ct.gia|floatformat:0 }} ₫</strong>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- FOOTER - ĐÃ SỬA THEO YÊU CẦU CỦA BẠN -->
+                    <div class="order-footer p-3 bg-light d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>Tổng thanh toán:</strong> 
+                            <span class="text-danger fs-5 fw-bold">{{ don.tong_tien|floatformat:0 }} ₫</span>
+                        </div>
+                        
+                        {% if don.trang_thai == 'da_xac_nhan' %}
+                            <!-- NÚT XANH - Cho phép bấm nhận hàng -->
+                            <button onclick="xacNhanNhanHang({{ don.id }})" 
+                                    class="btn btn-success btn-lg px-5">
+                                <i class="fas fa-check-circle"></i> Đã nhận được hàng
+                            </button>
+                        {% else %}
+                            <!-- NÚT XÁM - Chờ Admin xác nhận -->
+                            <button class="btn btn-secondary btn-lg px-5" disabled>
+                                <i class="fas fa-clock"></i> Đang chờ xác nhận
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-box-open fa-5x text-muted mb-4"></i>
+            <h5>Không có đơn hàng nào đang xử lý</h5>
+            <a href="{% url 'danh_sach_san_pham' %}" class="btn btn-primary mt-3">
+                <i class="fas fa-shopping-bag"></i> Tiếp tục mua sắm
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/don_hang.js' %}"></script>
+{% endblock %}

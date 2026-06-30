@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Túi Voucher Của Tôi - OutfitLab{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/voucher_cua_toi.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-center mb-5">🎟️ Túi Voucher Của Tôi</h2>
+
+    {% if vouchers %}
+        <div class="row g-4">
+            {% for uv in vouchers %}
+            <div class="col-md-6 col-lg-4">
+                <div class="voucher-card {% if uv.khuyen_mai.is_vip %}vip-voucher{% else %}normal-voucher{% endif %}">
+                    <div class="card-body text-center">
+                        {% if uv.khuyen_mai.is_vip %}
+                            <span class="badge bg-warning mb-2">⭐ VOUCHER VIP - VĨNH VIỄN</span>
+                        {% else %}
+                            <span class="badge bg-info mb-2">Voucher Thường</span>
+                        {% endif %}
+                        
+                        <h4>{{ uv.khuyen_mai.ten_khuyen_mai }}</h4>
+                        <h5 class="text-primary">{{ uv.khuyen_mai.ma_khuyen_mai }}</h5>
+                        
+                        <p class="fs-3 fw-bold">
+                            {% if uv.khuyen_mai.loai_giam == 'phan_tram' %}
+                                Giảm <strong>{{ uv.khuyen_mai.gia_tri }}%</strong>
+                            {% elif uv.khuyen_mai.loai_giam == 'freeship' %}
+                                FREESHIP <strong>{{ uv.khuyen_mai.gia_tri }}đ</strong>
+                            {% else %}
+                                Giảm <strong>{{ uv.khuyen_mai.gia_tri|floatformat:0 }}đ</strong>
+                            {% endif %}
+                        </p>
+                        
+                        <small>
+                            {% if uv.khuyen_mai.is_vip %}
+                                Vĩnh viễn • Có thể cộng dồn
+                            {% else %}
+                                Hạn sử dụng: {{ uv.khuyen_mai.thoi_han_ngay }} ngày
+                            {% endif %}
+                        </small>
+                    </div>
+                    <div class="card-footer text-center">
+                        <span class="badge bg-success">Chưa sử dụng • Dùng 1 lần</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-ticket-alt fa-6x text-muted mb-4"></i>
+            <h4>Bạn chưa có voucher nào</h4>
+            <a href="{% url 'su_kien_voucher' %}" class="btn btn-primary mt-3">Xem Sự Kiện Nhận Voucher</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

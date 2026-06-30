@@ -1,0 +1,243 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>{% block title %}OutfitLab - Khám phá phong cách của bạn{% endblock %}</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="icon" href="{% static 'images/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/chatbot.css' %}">
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg fixed-top shadow">
+        <div class="container-fluid px-4">
+            <!-- Logo -->
+            <a class="navbar-brand d-flex align-items-center ms-2" href="{% url 'trang_chu' %}">
+                <img src="{% static 'images/logo.png' %}" 
+                     alt="OutfitLab" 
+                     width="72" height="72" 
+                     class="me-2 logo-animate">
+                <div>
+                    <span class="brand-text">OutfitLab</span>
+                    <small class="slogan-text d-block">Khám phá phong cách của bạn</small>
+                </div>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'trang_chu' %}"><i class="fas fa-home"></i> Trang Chủ</a></li>
+                    
+            <!-- ==================== MENU SẢN PHẨM - THEO HÌNH ==================== -->
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                    <i class="fas fa-shirt"></i> Sản Phẩm
+                </a>
+                <ul class="dropdown-menu shadow-lg p-4" style="min-width: 680px; border-radius: 16px;">
+                    
+                    <div class="row g-4">
+
+                        <!-- NAM -->
+                        <div class="col-md-4">
+                            <li class="dropdown-header fw-bold text-primary d-flex align-items-center gap-2 mb-3 fs-5">
+                                👔 NAM
+                            </li>
+                            
+                            <a class="dropdown-item py-2" href="{% url 'danh_sach_san_pham' %}?gioi_tinh=nam&loai_san_pham=Áo">
+                                👕 Áo
+                            </a>
+                            <a class="dropdown-item py-2" href="{% url 'danh_sach_san_pham' %}?gioi_tinh=nam&loai_san_pham=Quần">
+                                👖 Quần
+                            </a>
+                            <a class="dropdown-item py-2" href="{% url 'danh_sach_san_pham' %}?gioi_tinh=nam&loai_san_pham=Phụ kiện">
+                                💎 Phụ Kiện
+                            </a>
+                            
+                            <hr class="dropdown-divider my-3">
+                            <a class="dropdown-item fw-bold py-2 text-primary" href="{% url 'danh_sach_san_pham' %}?gioi_tinh=nam">
+                                📋 Tất cả Nam
+                            </a>
+                        </div>
+
+                        <!-- NỮ -->
+                        <div class="col-md-4">
+                            <li class="dropdown-header fw-bold text-danger d-flex align-items-center gap-2 mb-3 fs-5">
+                                👗 NỮ
+                            </li>
+                            
+                            <a class="dropdown-item py-2" href="{% url 'danh_sach_san_pham' %}?gioi_tinh=nu&loai_san_pham=Áo">
+                                👚 Áo
+                            </a>
+                            <a class="dropdown-item py-2" href="{% url 'danh_sach_san_pham' %}?gioi_tinh=nu&loai_san_pham=Quần">
+                                👖 Quần & Váy
+                            </a>
+                            <a class="dropdown-item py-2" href="{% url 'danh_sach_san_pham' %}?gioi_tinh=nu&loai_san_pham=Phụ kiện">
+                                💎 Phụ Kiện
+                            </a>
+                            
+                            <hr class="dropdown-divider my-3">
+                            <a class="dropdown-item fw-bold py-2 text-danger" href="{% url 'danh_sach_san_pham' %}?gioi_tinh=nu">
+                                📋 Tất cả Nữ
+                            </a>
+                        </div>
+
+                        <!-- UNISEX -->
+                        <div class="col-md-4 border-start">
+                            <li class="dropdown-header fw-bold text-info d-flex align-items-center gap-2 mb-3 fs-5">
+                                🌐 UNISEX
+                            </li>
+                            
+                            <a class="dropdown-item py-2" href="{% url 'danh_sach_san_pham' %}?gioi_tinh=unisex&loai_san_pham=Áo">
+                                👕 Áo
+                            </a>
+                            <a class="dropdown-item py-2" href="{% url 'danh_sach_san_pham' %}?gioi_tinh=unisex&loai_san_pham=Quần">
+                                👖 Quần
+                            </a>
+                            <a class="dropdown-item py-2" href="{% url 'danh_sach_san_pham' %}?loai_san_pham=Phụ kiện">
+                                💎 Phụ Kiện
+                            </a>
+                            
+                            <hr class="dropdown-divider my-3">
+                            <a class="dropdown-item fw-bold py-2 text-info" href="{% url 'danh_sach_san_pham' %}?gioi_tinh=unisex">
+                                📋 Tất cả Unisex
+                            </a>
+                        </div>
+
+                    </div>
+                </ul>
+            </li>
+
+                <!-- Voucher Sự Kiện -->
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'su_kien_voucher' %}">
+                    <i class="fas fa-gift"></i> Sự Kiện
+                </a>
+            </li>
+
+        <!-- PHỐI ĐỒ AI - MỚI THÊM -->
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'phoi_do' %}">
+                    <i class="fas fa-magic"></i> Outfit AI
+                </a>
+            </li>
+
+                </ul>
+                
+               <!-- Search Thông Minh -->
+                <form class="d-flex me-4" action="{% url 'danh_sach_san_pham' %}" method="get">
+                    <input class="form-control me-2" 
+                        type="search" 
+                        name="q" 
+                        placeholder="Tìm quần âu, áo sơ mi, váy nữ, phụ kiện..." 
+                        style="width: 380px;"
+                        autocomplete="off">
+                    <button class="btn btn-outline-primary" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+
+                <!-- User & Cart -->
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" data-bs-toggle="dropdown">
+                                {% if user.avatar and user.avatar.url %}
+                                    <img src="{{ user.avatar.url }}" width="40" height="40" class="rounded-circle me-2" alt="Avatar">
+                                {% else %}
+                                    <img src="{% static 'images/avatar/macdinh.png' %}" width="40" height="40" class="rounded-circle me-2" alt="Avatar">
+                                {% endif %}
+                                {{ user.ho_ten|default:user.username }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'profile' %}">Hồ sơ</a></li>
+                                <li><a class="dropdown-item" href="{% url 'lich_su_don_hang' %}">Lịch sử đơn hàng</a></li>
+                                <li>
+                                    <a class="dropdown-item voucher-menu-item" href="{% url 'voucher_cua_toi' %}">
+                                        <i class="fas fa-ticket-alt me-2"></i>
+                                        Túi Voucher
+                                        <span class="badge bg-danger ms-2 voucher-count" id="voucher-count">0</span>
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{% url 'dang_xuat' %}">Đăng xuất</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'gio_hang' %}"><i class="fas fa-shopping-cart fa-lg"></i></a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'dang_nhap' %}">Đăng nhập</a></li>
+                        <li class="nav-item"><a class="nav-link btn btn-primary px-4" href="{% url 'dang_ky' %}">Đăng ký</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Nội dung chính -->
+    <div style="margin-top: 110px;">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- CHATBOT - Chỉ hiện khi đã đăng nhập -->
+    {% if user.is_authenticated %}
+    <div class="chatbot-container">
+        <div id="chatbot-bubble" class="chatbot-bubble">
+            <i class="fas fa-robot"></i>
+        </div>
+
+        <div id="chat-window" class="chat-window">
+            <div class="chat-header">
+                <div class="chat-header-info">
+                    <i class="fas fa-robot"></i>
+                    <div>
+                        <h5>Stylist AI</h5>
+                        <small>Được hỗ trợ bởi Grok • Tư vấn 24/7</small>
+                    </div>
+                </div>
+                <button id="close-chat" class="btn-close btn-close-white"></button>
+            </div>
+
+            <div id="chat-messages" class="chat-messages"></div>
+
+            <div class="chat-input-area">
+                <input type="text" id="chat-input" placeholder="Ví dụ: Tôi cao 1m78 nặng 65kg..." autocomplete="off">
+                <button id="send-btn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/base.js' %}"></script>
+    <script src="{% static 'js/chatbot.js' %}"></script>
+    <script>
+    // Ngăn script onboarding của Grok/xAI gây lỗi
+    window.addEventListener('load', function() {
+        document.querySelectorAll('script').forEach(script => {
+            if (script.src && script.src.includes('onboarding')) {
+                script.remove();
+            }
+        });
+    });
+</script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

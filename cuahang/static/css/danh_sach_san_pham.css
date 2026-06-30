@@ -1,0 +1,134 @@
+.product-card {
+    transition: all 0.3s ease;
+    border: none;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(236, 72, 153, 0.15) !important;
+}
+
+.product-card img {
+    height: 220px;
+    object-fit: cover;
+    transition: transform 0.4s;
+}
+
+.product-card:hover img {
+    transform: scale(1.08);
+}
+
+.filter-sidebar {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+}
+
+.filter-group {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+}
+
+.filter-group:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.filter-group h5 {
+    color: #ec4899;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+/* Star rating */
+.star-filter label {
+    display: block;
+    margin: 6px 0;
+    cursor: pointer;
+}
+
+/* Đảm bảo phần trên không bị che */
+.container-fluid {
+    padding-top: 20px;
+}
+
+.filter-sidebar {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+}
+
+/* Tăng khoảng cách cho thanh sắp xếp */
+.d-flex.justify-content-between {
+    background: #fff;
+    padding: 15px 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    margin-bottom: 25px;
+}
+
+.product-page{
+    min-height:100vh;
+}
+
+
+.filter-sidebar{
+
+    position:sticky;
+    top:120px;
+
+    max-height:80vh;
+    overflow-y:auto;
+
+    background:white;
+    border-radius:20px;
+
+    padding:25px;
+
+    box-shadow:0 8px 30px rgba(0,0,0,.08);
+
+}
+
+
+.sort-bar{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    margin-bottom:25px;
+
+}
+
+
+.product-card{
+
+    border:none;
+    border-radius:20px;
+
+    overflow:hidden;
+
+    transition:.35s;
+}
+
+
+.product-card:hover{
+
+    transform:
+        translateY(-8px)
+        scale(1.02);
+
+    box-shadow:
+        0 15px 35px rgba(0,0,0,.12);
+
+}
+
+
+#productGrid{
+
+    transition:.3s;
+}

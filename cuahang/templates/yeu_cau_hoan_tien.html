@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Yêu Cầu Hoàn Tiền - OutfitLab{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/yeu_cau_hoan_tien.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="margin-top: 130px;">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="form-container">
+                
+                <!-- Header -->
+                <div class="custom-form-header text-center">
+                    <i class="fas fa-undo-alt fa-3x mb-3"></i>
+                    <h3 class="mb-1">Yêu Cầu Hoàn Tiền / Trả Hàng</h3>
+                    <p class="mb-0 opacity-75">Chúng tôi sẽ hỗ trợ bạn trong thời gian sớm nhất</p>
+                </div>
+
+                <div class="card-body p-5">
+                    
+                    <!-- Thông tin đơn hàng -->
+                    <div class="d-flex align-items-center gap-4 p-4 bg-light rounded-4 mb-5">
+                        {% if san_pham.hinh_anh %}
+                            <img src="{{ san_pham.hinh_anh.url }}" 
+                                 class="history-img" alt="{{ san_pham.ten_san_pham }}">
+                        {% endif %}
+                        <div>
+                            <h5 class="mb-1">Đơn hàng #{{ don.id }}</h5>
+                            <p class="mb-0 fw-semibold">{{ san_pham.ten_san_pham }}</p>
+                            <small class="text-muted">Ngày đặt: {{ don.ngay_dat|date:"d/m/Y H:i" }}</small>
+                        </div>
+                    </div>
+
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            {{ form.ly_do.label_tag }}
+                            {{ form.ly_do }}
+                            {{ form.ly_do.errors }}
+                        </div>
+                        
+                        <div class="mb-4">
+                            {{ form.mo_ta.label_tag }}
+                            {{ form.mo_ta }}
+                            {{ form.mo_ta.errors }}
+                        </div>
+                        
+                        <div class="mb-4">
+                            {{ form.hinh_anh.label_tag }}
+                            {{ form.hinh_anh }}
+                            {{ form.hinh_anh.errors }}
+                        </div>
+
+                        <div class="mt-5 text-center">
+                            <button type="submit" class="btn btn-danger btn-lg px-5 py-3">
+                                <i class="fas fa-paper-plane me-2"></i> Gửi Yêu Cầu
+                            </button>
+                            <a href="{% url 'lich_su_don_hang' %}" 
+                               class="btn btn-outline-secondary btn-lg px-5 py-3 ms-3">
+                                <i class="fas fa-arrow-left me-2"></i> Quay lại
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/yeu_cau_hoan_tien.js' %}"></script>
+{% endblock %}

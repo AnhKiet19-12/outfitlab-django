@@ -1,0 +1,89 @@
+/* ====================== LỊCH SỬ ĐƠN HÀNG CSS ====================== */
+
+.history-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.history-card:hover {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    transform: translateY(-3px);
+}
+
+.history-header {
+    background: linear-gradient(135deg, #ec4899, #0ea5e9);
+    color: white;
+    padding: 15px 20px;
+}
+
+.history-img {
+    width: 65px;
+    height: 65px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 2px solid #f1f1f1;
+}
+
+.history-footer {
+    padding: 15px 20px;
+    background: #f8fafc;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* ==================== MODAL HOÀN TIỀN ==================== */
+.custom-modal {
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 20px 50px rgba(236, 72, 153, 0.25);
+    overflow: hidden;
+    animation: modalPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalPop {
+    from {
+        opacity: 0;
+        transform: scale(0.6) translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.custom-modal .modal-header {
+    background: linear-gradient(135deg, #fee2e2, #fef3c7);
+    border-bottom: none;
+    padding: 20px 25px;
+}
+
+.custom-modal .modal-body {
+    padding: 25px;
+}
+
+.custom-modal .modal-footer {
+    padding: 20px 25px;
+    background: #f8fafc;
+}
+
+/* Style cho select và textarea */
+#lyDo, #moTa {
+    border-radius: 12px;
+    border: 2px solid #e5e7eb;
+    transition: all 0.3s ease;
+}
+
+#lyDo:focus, #moTa:focus {
+    border-color: #ec4899;
+    box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.15);
+}
+
+/* Badge trong modal */
+#modal-product-info {
+    background: #f8fafc;
+    border-left: 4px solid #ec4899;
+}

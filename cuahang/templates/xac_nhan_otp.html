@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Xác Nhận OTP - Thời Trang VN{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dangnhap.css' %}">
+<style>
+    .otp-container {
+        max-width: 480px;
+        margin: 100px auto;
+        padding: 40px 30px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.18);
+    }
+    .otp-input {
+        font-size: 2rem;
+        letter-spacing: 12px;
+        text-align: center;
+        font-weight: 600;
+        height: 65px;
+    }
+    .otp-info {
+        font-size: 0.95rem;
+        color: #666;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="otp-container">
+    <div class="text-center mb-4">
+        <h3 class="mb-2">Xác Nhận Mã OTP</h3>
+        <p class="otp-info">
+            Chúng tôi đã gửi một mã OTP 6 số đến email:<br>
+            <strong>{{ email|default:"email của bạn" }}</strong>
+        </p>
+        <p class="text-muted small">Mã OTP có hiệu lực trong 10 phút</p>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} text-center">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST" id="otpForm">
+        {% csrf_token %}
+        <input type="hidden" name="email" value="{{ email|default:'' }}">
+
+        <div class="mb-4">
+            <input type="text" 
+                   name="otp" 
+                   id="otpInput"
+                   class="form-control otp-input" 
+                   maxlength="6" 
+                   placeholder="000000" 
+                   autocomplete="off"
+                   required>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold" id="btnVerify">
+            Xác Nhận OTP
+        </button>
+    </form>
+
+    <div class="text-center mt-4">
+        <a href="{% url 'quen_mat_khau' %}" class="text-decoration-none small">
+            ← Gửi lại mã OTP
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const otpInput = document.getElementById('otpInput');
+    const form = document.getElementById('otpForm');
+    const btnVerify = document.getElementById('btnVerify');
+
+    // Tự động focus vào ô nhập OTP
+    otpInput.focus();
+
+    // Xử lý submit form
+    form.addEventListener('submit', function() {
+        btnVerify.innerHTML = `
+            Đang xác thực 
+            <span class="spinner-border spinner-border-sm" role="status"></span>
+        `;
+        btnVerify.disabled = true;
+    });
+
+    // Hiển thị thông báo từ Django messages
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'success' %}
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công!',
+                    text: '{{ message }}',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            {% elif message.tags == 'error' %}
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Xác thực thất bại',
+                    text: '{{ message }}',
+                    confirmButtonText: 'Thử lại'
+                });
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+});
+</script>
+{% endblock %}

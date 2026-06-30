@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Outfit AI - Tư Vấn Phối Đồ Thông Minh{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/phoi_do.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="phoi-do-container py-5">
+    <div class="container">
+
+        <div class="text-center mb-5">
+            <h1 class="display-5 fw-bold text-pink mb-2">
+                <i class="fas fa-magic"></i> Outfit AI
+            </h1>
+            <p class="lead text-muted">Phối đồ thông minh theo body, màu da, dịp & phong cách của bạn</p>
+        </div>
+
+        <!-- FORM INPUT -->
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-8 col-xl-7">
+                <div class="card shadow-lg border-0">
+                    <div class="card-header bg-gradient text-white py-3">
+                        <h5 class="mb-0"><i class="fas fa-user"></i> Thông tin cá nhân hóa</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="outfit-form">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Giới tính</label>
+                                    <select id="gioi_tinh" class="form-select">
+                                        <option value="nam">Nam</option>
+                                        <option value="nu">Nữ</option>
+                                        <option value="unisex">Unisex</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Chiều cao (cm)</label>
+                                    <input type="text" id="chieu_cao" class="form-control" placeholder="170" value="{{ user.chieu_cao|default:'' }}">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Cân nặng (kg)</label>
+                                    <input type="text" id="can_nang" class="form-control" placeholder="65" value="{{ user.can_nang|default:'' }}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Màu da</label>
+                                    <select id="mau_da" class="form-select">
+                                        <option value="trang">Trắng sáng</option>
+                                        <option value="vang">Vàng ấm</option>
+                                        <option value="ngam">Ngăm khỏe</option>
+                                        <option value="den">Da tối</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Dáng người</label>
+                                <select id="dang_nguoi" class="form-select">
+                                    <option value="">Tôi không chắc / Không chọn</option>
+                                    <option value="hourglass">Đồng hồ cát</option>
+                                    <option value="pear">Quả lê</option>
+                                    <option value="apple">Quả táo</option>
+                                    <option value="rectangle">Hình chữ nhật</option>
+                                    <option value="inverted">Tam giác ngược</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Dịp mặc</label>
+                                <select id="dip" class="form-select">
+                                    <option value="casual">Hàng ngày / Casual</option>
+                                    <option value="office">Công sở</option>
+                                    <option value="date">Hẹn hò / Tiệc</option>
+                                    <option value="travel">Du lịch</option>
+                                    <option value="street">Street style</option>
+                                    <option value="sport">Thể thao / Năng động</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Phong cách yêu thích</label>
+                                <select id="phong_cach" class="form-select">
+                                    <option value="casual">Casual</option>
+                                    <option value="streetwear">Streetwear</option>
+                                    <option value="thanhlich">Thanh lịch</option>
+                                    <option value="sangtrong">Sang trọng</option>
+                                    <option value="nangdong">Năng động</option>
+                                    <option value="hanquoc">Hàn Quốc</option>
+                                </select>
+                            </div>
+
+                            <button type="button" id="btn-generate" class="btn btn-pink btn-lg w-100 mt-4">
+                                <i class="fas fa-sparkles"></i> Tạo Outfit Ngay
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KẾT QUẢ AI -->
+        <div id="outfit-result" class="card shadow-lg border-0" style="display: none;">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <h5 class="mb-0"><i class="fas fa-shirt"></i> Outfit AI Gợi Ý</h5>
+                <button id="add-all-to-cart" class="btn btn-success btn-sm">
+                    <i class="fas fa-cart-plus"></i> Thêm toàn bộ vào giỏ
+                </button>
+            </div>
+            <div class="card-body">
+                <div id="style-advice" class="mb-4"></div>
+                
+                <div class="mb-4">
+                    <h6 class="text-muted mb-3">👕 Các món trong outfit</h6>
+                    <div id="ai-items" class="row g-3"></div>
+                </div>
+
+                <div>
+                    <h6 class="text-muted mb-3">🛍️ Sản phẩm gợi ý từ shop</h6>
+                    <div class="row g-3" id="product-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div id="loading-state" class="text-center py-5" style="display: none;">
+            <div class="spinner-grow text-pink mb-3" style="width: 3.5rem; height: 3.5rem;"></div>
+            <p class="text-muted fs-5">Outfit AI đang suy nghĩ...</p>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/phoi_do.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Thông Tin Cá Nhân - OutfitLab{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/thongtin.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                <div class="card-header text-center py-4" 
+                     style="background: linear-gradient(135deg, #ec4899, #0ea5e9); color: white;">
+                    <h3 class="mb-0 fw-bold">Thông Tin Cá Nhân</h3>
+                </div>
+
+                <div class="card-body p-5">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="POST" enctype="multipart/form-data" id="profileForm">
+                        {% csrf_token %}
+
+                        <!-- Avatar + Hạng Thành Viên -->
+                        <div class="text-center mb-5">
+                            <div class="position-relative d-inline-block" id="avatarWrapper">
+                                <img id="avatarImage" 
+                                     src="{% if user.avatar %}{{ user.avatar.url }}{% else %}{% static 'images/avatar/macdinh.png' %}{% endif %}" 
+                                     alt="Avatar" 
+                                     class="rounded-circle avatar-main"
+                                     width="180" height="180">
+
+                                <!-- Badge Hạng Thành Viên -->
+                                <div class="hang-thanh-vien-badge" 
+                                     data-bs-toggle="tooltip" 
+                                     data-bs-html="true"
+                                     title="<strong>{{ current_hang.ten }}</strong><br>
+                                            <small>{{ current_hang.uu_dai }}</small>">
+                                    <img src="{% static 'images/hangmuc/' %}{{ current_hang.icon }}" 
+                                         width="65" height="65" 
+                                         class="hang-icon" 
+                                         alt="{{ current_hang.ten }}">
+                                </div>
+
+                                <div class="avatar-overlay" id="avatarOverlay">
+                                    <i class="fas fa-camera fa-2x"></i>
+                                </div>
+
+                                <div class="avatar-menu shadow" id="avatarMenu">
+                                    <label for="id_avatar" class="menu-item">
+                                        <i class="fas fa-upload"></i> Cập nhật ảnh mới
+                                    </label>
+                                    <a href="#" id="btnDeleteAvatar" class="menu-item text-danger">
+                                        <i class="fas fa-trash"></i> Xóa ảnh hiện tại
+                                    </a>
+                                </div>
+                            </div>
+
+                            <input type="file" id="id_avatar" name="avatar" style="display: none;">
+                            <input type="hidden" id="delete_avatar" name="delete_avatar" value="false">
+
+                            <h4 class="mt-3 mb-1 fw-bold" style="color: {{ current_hang.mau }};">
+                                {{ current_hang.ten }}
+                            </h4>
+                            <small class="text-muted">
+                                Tổng chi tiêu: <strong>{{ tong_chi_tieu|floatformat:0 }} ₫</strong>
+                            </small>
+                        </div>
+
+                        <!-- Thông tin cá nhân -->
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold"><i class="fas fa-user me-2 text-pink"></i> Họ và tên</label>
+                                {{ form.ho_ten }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold"><i class="fas fa-envelope me-2 text-pink"></i> Email</label>
+                                {{ form.email }}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold"><i class="fas fa-phone me-2 text-pink"></i> Số điện thoại</label>
+                                {{ form.so_dien_thoai }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold"><i class="fas fa-map-marker-alt me-2 text-pink"></i> Địa chỉ giao hàng</label>
+                                {{ form.dia_chi }}
+                                <small class="text-muted d-block mt-1">
+                                    Địa chỉ này sẽ được sử dụng khi bạn đặt hàng
+                                </small>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold"><i class="fas fa-ruler-vertical me-2 text-pink"></i> Chiều cao (cm)</label>
+                                {{ form.chieu_cao }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold"><i class="fas fa-weight me-2 text-pink"></i> Cân nặng (kg)</label>
+                                {{ form.can_nang }}
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-bold"><i class="fas fa-heart me-2 text-pink"></i> Sở thích</label>
+                                {{ form.so_thich }}
+                                <small class="text-muted">Ví dụ: the_thao, cong_so, casual, thoi_trang</small>
+                            </div>
+                        </div>
+
+                        <div class="mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg w-100 py-3 fw-bold">
+                                <i class="fas fa-save me-2"></i> Cập Nhật Thông Tin
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const defaultAvatarUrl = "{% static 'images/avatar/macdinh.png' %}";
+    
+    // Khởi tạo tooltip cho badge hạng thành viên
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
+<script src="{% static 'js/thongtin.js' %}"></script>
+{% endblock %}

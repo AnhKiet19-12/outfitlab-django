@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Đăng Ký - Thời Trang VN{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dangky.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="register-container">
+    <div class="register-form">
+        <h2 class="text-center mb-4">Tạo Tài Khoản Mới</h2>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" id="registerForm">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Tên tài khoản <span class="text-danger">*</span></label>
+                    <input type="text" name="username" class="form-control" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Họ và tên</label>
+                    <input type="text" name="ho_ten" class="form-control">
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Email <span class="text-danger">*</span></label>
+                <input type="email" name="email" class="form-control" required>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Mật khẩu <span class="text-danger">*</span></label>
+                    <input type="password" name="password" id="pass1" class="form-control" required>
+                    <small class="text-muted" id="passwordHelp"></small>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Xác nhận mật khẩu <span class="text-danger">*</span></label>
+                    <input type="password" id="pass2" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Số điện thoại</label>
+                    <input type="text" name="so_dien_thoai" class="form-control">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Giới tính</label>
+                    <select name="gioi_tinh" class="form-select">
+                        <option value="">Chọn giới tính</option>
+                        <option value="Nam">Nam</option>
+                        <option value="Nữ">Nữ</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100 py-3 mt-3 fw-bold" id="btnRegister">Đăng Ký</button>
+        </form>
+
+        <p class="text-center mt-4">
+            Đã có tài khoản? <a href="{% url 'dang_nhap' %}" class="text-primary">Đăng nhập ngay</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+    const pass1 = document.getElementById('pass1').value;
+    const pass2 = document.getElementById('pass2').value;
+
+    // Validation mật khẩu mạnh
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    
+    if (!regex.test(pass1)) {
+        e.preventDefault();
+        Swal.fire({
+            icon: 'error',
+            title: 'Mật khẩu không đủ mạnh',
+            html: 'Mật khẩu phải có ít nhất:<br>• 8 ký tự<br>• 1 chữ hoa<br>• 1 chữ thường<br>• 1 số<br>• 1 ký tự đặc biệt (@$!%*?&)'
+        });
+        return;
+    }
+
+    if (pass1 !== pass2) {
+        e.preventDefault();
+        Swal.fire({
+            icon: 'error',
+            title: 'Xác nhận mật khẩu không khớp',
+        });
+    }
+});
+
+// Thông báo sau khi đăng ký thành công (nếu có message)
+{% if messages %}
+    {% for message in messages %}
+        {% if message.tags == 'success' %}
+            Swal.fire({
+                icon: 'success',
+                title: 'Đăng ký thành công!',
+                text: '{{ message }}',
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => {
+                window.location.href = "{% url 'dang_nhap' %}";
+            });
+        {% endif %}
+    {% endfor %}
+{% endif %}
+</script>
+{% endblock %}

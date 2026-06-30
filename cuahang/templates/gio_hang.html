@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Giỏ Hàng - OutfitLab{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/gio_hang.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="margin-top: 130px;">
+    <h2 class="mb-4 fw-bold text-center">
+        <i class="fas fa-shopping-cart text-pink"></i> Giỏ Hàng Của Bạn
+    </h2>
+
+    {% if gio_hang %}
+        <div class="row">
+            <!-- Danh sách sản phẩm -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="selectAll">
+                            <label class="form-check-label fw-bold" for="selectAll">
+                                Chọn tất cả ({{ gio_hang|length }} sản phẩm)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        {% for item in gio_hang %}
+                        <div class="cart-item border-bottom p-4" data-id="{{ item.id }}">
+                            <div class="row align-items-center">
+                                <div class="col-auto">
+                                    <input class="form-check-input item-checkbox" type="checkbox" data-id="{{ item.id }}">
+                                </div>
+                                <div class="col-auto">
+                                    {% if item.san_pham.hinh_anh %}
+                                        <img src="{{ item.san_pham.hinh_anh.url }}" class="cart-img" alt="{{ item.san_pham.ten_san_pham }}">
+                                    {% endif %}
+                                </div>
+                                <div class="col">
+                                    <h6 class="mb-1">{{ item.san_pham.ten_san_pham }}</h6>
+                                    <small class="text-muted">
+                                        Size: {{ item.bien_the.kich_co|default:"M" }} | 
+                                        Màu: {{ item.bien_the.mau_sac|default:"Đen" }}
+                                    </small>
+                                    <p class="text-danger fw-bold mt-2 mb-0">
+                                        {{ item.bien_the.gia|floatformat:0 }} ₫
+                                    </p>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="quantity-control d-flex align-items-center">
+                                        <button class="btn btn-outline-secondary btn-sm minus-btn">-</button>
+                                        <input type="number" class="form-control text-center quantity-input mx-2" 
+                                               value="{{ item.so_luong }}" min="1" style="width: 70px;">
+                                        <button class="btn btn-outline-secondary btn-sm plus-btn">+</button>
+                                    </div>
+                                </div>
+                                <div class="col-auto text-end">
+                                    <p class="fw-bold mb-1 item-total">
+                                        {{ item.thanh_tien|floatformat:0 }} ₫
+                                    </p>
+                                    <button class="btn btn-link text-danger p-0 remove-btn">
+                                        <i class="fas fa-trash"></i> Xóa
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tóm tắt thanh toán -->
+            <div class="col-lg-4">
+                <div class="cart-summary card shadow-sm border-0 sticky-top" style="top: 140px;">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">Tóm tắt đơn hàng</h5>
+                        <hr>
+                        
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Tạm tính:</span>
+                            <span id="tam_tinh" class="fw-bold">{{ tong_tien|floatformat:0 }} ₫</span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Voucher Giảm Giá</label>
+                            <select id="voucher_giamgia" class="form-select" onchange="updateTotal()">
+                                <option value="">Không dùng voucher giảm giá</option>
+                                {% for uv in vouchers %}
+                                    {% if uv.khuyen_mai.loai_giam != 'freeship' %}
+                                    <option value="{{ uv.khuyen_mai.ma_khuyen_mai }}" 
+                                            data-type="{{ uv.khuyen_mai.loai_giam }}"
+                                            data-value="{{ uv.khuyen_mai.gia_tri }}">
+                                        {{ uv.khuyen_mai.ten_khuyen_mai }}
+                                    </option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Voucher Freeship</label>
+                            <select id="voucher_freeship" class="form-select" onchange="updateTotal()">
+                                <option value="">Không dùng freeship</option>
+                                {% for uv in vouchers %}
+                                    {% if uv.khuyen_mai.loai_giam == 'freeship' %}
+                                    <option value="{{ uv.khuyen_mai.ma_khuyen_mai }}" 
+                                            data-type="freeship"
+                                            data-value="{{ uv.khuyen_mai.gia_tri }}">
+                                        {{ uv.khuyen_mai.ten_khuyen_mai }}
+                                    </option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="summary-row mb-2">
+                            <span>Phí vận chuyển:</span>
+                            <span id="phi_ship_display" class="text-muted">30.000 ₫</span>
+                        </div>
+
+                        <div id="giam_gia_row" class="summary-row text-success" style="display: none;">
+                            <span>Giảm giá:</span>
+                            <span id="giam_gia_amount">-0 ₫</span>
+                        </div>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between mb-3 fs-5 fw-bold">
+                            <span>Tổng thanh toán:</span>
+                            <span id="tong_tien_final" class="text-danger">{{ tong_tien|floatformat:0 }} ₫</span>
+                        </div>
+
+                        <button onclick="thanhToan()" class="btn btn-primary btn-lg w-100 py-3 fw-bold">
+                            <i class="fas fa-credit-card"></i> TIẾP TỤC THANH TOÁN
+                        </button>
+                    </div>
+                </div>
+            </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-shopping-cart fa-5x text-muted mb-4"></i>
+            <h3>Giỏ hàng của bạn đang trống</h3>
+            <a href="{% url 'danh_sach_san_pham' %}" class="btn btn-primary btn-lg px-5 mt-3">
+                Khám phá sản phẩm
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/gio_hang.js' %}"></script>
+{% endblock %}

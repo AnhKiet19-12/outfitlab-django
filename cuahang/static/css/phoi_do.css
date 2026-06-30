@@ -1,0 +1,54 @@
+.phoi-do-container {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    min-height: 100vh;
+}
+
+.btn-pink {
+    background: linear-gradient(135deg, #ec4899, #db2777);
+    border: none;
+    color: white;
+    font-weight: 600;
+}
+
+.btn-pink:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(236, 72, 153, 0.3);
+}
+
+.card {
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.bg-gradient {
+    background: linear-gradient(135deg, #ec4899, #0ea5e9);
+}
+
+.product-card {
+    transition: all 0.3s;
+}
+
+.product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+
+/* ==================== LAYOUT VERTICAL ==================== */
+#outfit-result {
+    margin-top: 2rem;
+}
+
+#ai-items .card {
+    border: 1px solid #f0f0f0;
+}
+
+#product-list .col-md-6 {
+    margin-bottom: 1.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .phoi-do-container {
+        margin-top: 80px;
+    }
+}

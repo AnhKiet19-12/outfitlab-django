@@ -1,0 +1,63 @@
+/* voucher_cua_toi.css */
+.voucher-card {
+    transition: all 0.4s ease;
+    border-radius: 18px;
+    overflow: hidden;
+    height: 100%;
+}
+
+.voucher-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(236, 72, 153, 0.3);
+}
+
+.normal-voucher {
+    border: 2px solid #67e8f9;
+}
+
+.vip-voucher {
+    border: 3px solid #fbbf24;
+    position: relative;
+}
+
+.vip-voucher::before {
+    content: "⭐ VIP";
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: #fbbf24;
+    color: #000;
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 3px 10px;
+    border-radius: 20px;
+    z-index: 10;
+}
+
+.voucher-card .card-body {
+    padding: 2rem 1.5rem;
+}
+
+.voucher-card h4 {
+    font-size: 1.35rem;
+    font-weight: 700;
+}
+
+.voucher-card h5 {
+    color: #6b7280;
+    font-size: 1.1rem;
+}
+
+.fs-3 {
+    font-size: 2.2rem !important;
+    background: linear-gradient(90deg, #ec4899, #0ea5e9);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Badge */
+.badge {
+    font-size: 0.85rem;
+    padding: 6px 12px;
+}

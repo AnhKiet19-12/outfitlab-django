@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sự Kiện Voucher - OutfitLab{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/su_kien_voucher.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">
+            <i class="fas fa-gift fa-spin me-3" style="color: #ec4899;"></i>
+            Sự Kiện Voucher
+        </h1>
+        <p class="lead">Hạng thành viên: <strong style="color: var(--primary-pink);">{{ user_hang|upper }}</strong></p>
+    </div>
+
+    <!-- Voucher Thường -->
+    <h3 class="mb-4 text-success border-bottom pb-2">
+        <i class="fas fa-ticket-alt"></i> Voucher Thường (Mỗi tháng 1 lần)
+    </h3>
+    <div class="row g-4 mb-5">
+        {% for v in vouchers_thuong %}
+        <div class="col-md-6 col-lg-4">
+            <div class="voucher-card normal-voucher">
+                <div class="card-body text-center">
+                    <h5 class="fw-bold">{{ v.ten_khuyen_mai }}</h5>
+                    <h4 class="text-primary">{{ v.ma_khuyen_mai }}</h4>
+                    <p class="fs-3 fw-bold mt-3">
+                        {% if v.loai_giam == 'phan_tram' %}
+                            Giảm <strong>{{ v.gia_tri }}%</strong>
+                        {% elif v.loai_giam == 'freeship' %}
+                            FREESHIP <strong>{{ v.gia_tri }}đ</strong>
+                        {% else %}
+                            Giảm <strong>{{ v.gia_tri|floatformat:0 }}đ</strong>
+                        {% endif %}
+                    </p>
+                    <small class="text-muted">Hạn {{ v.thoi_han_ngay }} ngày</small>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'nhan_voucher_event' v.ma_khuyen_mai %}" class="btn btn-success w-100">
+                        <i class="fas fa-gift"></i> Nhận Ngay
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center text-muted py-4">Chưa có voucher thường nào.</div>
+        {% endfor %}
+    </div>
+
+    <!-- Voucher VIP -->
+    <h3 class="mb-4 text-warning border-bottom pb-2">
+        <i class="fas fa-crown"></i> Voucher Hạng Thành Viên (Vĩnh viễn)
+    </h3>
+    <div class="row g-4">
+        {% for item in vouchers_vip %}
+        <div class="col-md-6 col-lg-4">
+            <div class="voucher-card vip-voucher">
+                <div class="card-body text-center">
+                    <span class="badge bg-warning mb-3">VIP • {{ item.km.get_doi_tuong_display }}</span>
+                    <h5>{{ item.km.ten_khuyen_mai }}</h5>
+                    <h4 class="text-danger">{{ item.km.ma_khuyen_mai }}</h4>
+                    
+                    <p class="fs-3 fw-bold mt-3">
+                        {% if item.km.loai_giam == 'phan_tram' %}
+                            Giảm <strong>{{ item.km.gia_tri }}%</strong>
+                        {% elif item.km.loai_giam == 'freeship' %}
+                            FREESHIP <strong>{{ item.km.gia_tri }}đ</strong>
+                        {% else %}
+                            Giảm <strong>{{ item.km.gia_tri|floatformat:0 }}đ</strong>
+                        {% endif %}
+                    </p>
+                    <small class="text-success">Vĩnh viễn • Cộng dồn được</small>
+                </div>
+                <div class="card-footer">
+                    {% if item.co_the_nhan %}
+                        <a href="{% url 'nhan_voucher_event' item.km.ma_khuyen_mai %}" class="btn btn-warning w-100">
+                            <i class="fas fa-crown"></i> Nhận Voucher VIP
+                        </a>
+                    {% else %}
+                        <button class="btn btn-secondary w-100" disabled>Hạng mức không đủ</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

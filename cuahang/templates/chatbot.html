@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Stylist AI - Tư Vấn Thời Trang Thông Minh{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/chatbot.css' %}">
+<style>
+    .chat-messages {
+        background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+    }
+    .suggestion-chip {
+        display: inline-block;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 9999px;
+        padding: 8px 16px;
+        margin: 4px 2px;
+        font-size: 13.8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+    .suggestion-chip:hover {
+        background: #ec4899;
+        color: white;
+        border-color: #ec4899;
+        transform: translateY(-1px);
+    }
+    .typing {
+        font-style: italic;
+        color: #888;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 920px; margin-top: 80px;">
+    <div class="text-center mb-5">
+        <div class="d-inline-flex align-items-center gap-3 mb-3">
+            <div class="bg-gradient rounded-circle p-3" style="background: linear-gradient(135deg, #ec4899, #0ea5e9);">
+                <i class="fas fa-robot fa-3x text-white"></i>
+            </div>
+            <div>
+                <h2 class="fw-bold text-pink">Stylist AI</h2>
+                <p class="text-muted mb-0">Trợ lý thời trang thông minh • Hỗ trợ 24/7</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-window" style="position: relative; width: 100%; height: 650px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); border-radius: 24px; overflow: hidden; display: flex; flex-direction: column;">
+        
+        <div class="chat-header">
+            <div class="chat-header-info">
+                <i class="fas fa-robot"></i>
+                <div>
+                    <h5>Stylist AI <span class="badge bg-success ms-2">Online</span></h5>
+                    <small>Được hỗ trợ bởi Gemini • Tư vấn phong cách</small>
+                </div>
+            </div>
+            <button onclick="window.location.href='{% url 'trang_chu' %}'" class="btn-close btn-close-white"></button>
+        </div>
+
+        <div id="chat-messages" class="chat-messages flex-grow-1"></div>
+
+        <!-- Quick Suggestions -->
+        <div class="px-4 py-3 bg-light border-top" id="quick-suggestions">
+            <small class="text-muted d-block mb-2">Gợi ý nhanh:</small>
+            <div class="d-flex flex-wrap gap-2" id="suggestion-list"></div>
+        </div>
+
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Ví dụ: Gợi ý outfit thể thao nam cao 1m78..." autocomplete="off">
+            <button id="send-btn">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/chatbot.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('send-btn');
+    const messagesContainer = document.getElementById('chat-messages');
+    const suggestionList = document.getElementById('suggestion-list');
+
+    const quickPrompts = [
+        "Gợi ý outfit hè nam",
+        "Tôi cao 1m75 nặng 65kg nên mặc size gì?",
+        "Phối đồ đi chơi cuối tuần",
+        "Đơn hàng gần nhất của tôi",
+        "Gợi ý áo sơ mi nữ",
+        "Phong cách thể thao"
+    ];
+
+    function addQuickSuggestions() {
+        suggestionList.innerHTML = '';
+        quickPrompts.forEach(prompt => {
+            const chip = document.createElement('div');
+            chip.className = 'suggestion-chip';
+            chip.textContent = prompt;
+            chip.onclick = () => {
+                input.value = prompt;
+                sendMessage();
+            };
+            suggestionList.appendChild(chip);
+        });
+    }
+
+    async function loadHistory() {
+        try {
+            const res = await fetch('/chatbot/', {
+                credentials: 'include'
+            });
+            if (!res.ok) throw new Error('Failed to load');
+            
+            const data = await res.json();
+            
+            messagesContainer.innerHTML = '';
+
+            if (data.history && data.history.length > 0) {
+                data.history.forEach(item => {
+                    const msg = item.message || '';
+                    if (item.is_bot) addBotMessage(msg);
+                    else addUserMessage(msg);
+                });
+            } else {
+                addBotMessage("Chào bạn! 👋 Mình là Stylist AI. Hôm nay bạn muốn tư vấn phối đồ, size hay gợi ý sản phẩm?");
+            }
+            addQuickSuggestions();
+        } catch(e) {
+            console.error(e);
+            addBotMessage("Chào bạn! Mình là Stylist AI. Bạn cần hỗ trợ gì hôm nay?");
+        }
+    }
+
+    function addMessage(text, type) {
+        const safeText = (text || '').toString();
+        const div = document.createElement('div');
+        div.className = `message ${type}`;
+        div.innerHTML = safeText.replace(/\n/g, '<br>');
+        messagesContainer.appendChild(div);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function addBotMessage(text) { addMessage(text, 'bot'); }
+    function addUserMessage(text) { addMessage(text, 'user'); }
+
+    async function sendMessage() {
+        const text = input.value.trim();
+        if (!text) return;
+
+        addUserMessage(text);
+        input.value = '';
+
+        // Typing indicator
+        const typingId = 'typing-' + Date.now();
+        const typingDiv = document.createElement('div');
+        typingDiv.id = typingId;
+        typingDiv.className = 'message bot typing';
+        typingDiv.innerHTML = 'Stylist AI đang suy nghĩ...';
+        messagesContainer.appendChild(typingDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+        try {
+            const response = await fetch('/chatbot/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                credentials: 'include',
+                body: `message=${encodeURIComponent(text)}`
+            });
+
+            const data = await response.json();
+            
+            document.getElementById(typingId).remove();
+            addBotMessage(data.response || "Mình chưa hiểu rõ, bạn nói thêm được không?");
+            
+            setTimeout(addQuickSuggestions, 700);
+
+        } catch (e) {
+            console.error(e);
+            document.getElementById(typingId).remove();
+            addBotMessage("Xin lỗi, hiện đang có lỗi. Bạn thử lại sau nhé!");
+        }
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    input.addEventListener('keypress', e => {
+        if (e.key === 'Enter') sendMessage();
+    });
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Khởi tạo
+    loadHistory();
+});
+</script>
+{% endblock %}                                                                          

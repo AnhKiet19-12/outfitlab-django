@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Lịch Sử Đơn Hàng - OutfitLab{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/lich_su_don_hang.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="margin-top: 130px;">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-pink mb-0">
+            <i class="fas fa-history"></i> Lịch Sử Đơn Hàng
+        </h2>
+        
+        <div>
+            <a href="{% url 'lich_su_hoan_tien' %}" class="btn btn-outline-primary me-3">
+                <i class="fas fa-undo"></i> Lịch sử hoàn tiền / Trả hàng
+            </a>
+            
+            <ul class="nav nav-tabs d-inline-flex">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'don_hang' %}">
+                        <i class="fas fa-truck"></i> Đơn hàng đang xử lý
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'lich_su_don_hang' %}">
+                        <i class="fas fa-history"></i> Lịch sử đơn hàng
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    {% if don_hang %}
+        <div class="row g-4">
+            {% for don in don_hang %}
+            <div class="col-12">
+                <div class="history-card shadow-sm">
+                    <div class="history-header p-3 border-bottom">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <strong class="fs-5">#{{ don.id }}</strong>
+                            <span class="badge bg-success">
+                                {{ don.get_trang_thai_display|default:"Đã hoàn thành" }}
+                            </span>
+                        </div>
+                        <small class="text-muted">
+                            Đặt ngày: {{ don.ngay_dat|date:"d/m/Y H:i" }}
+                        </small>
+                    </div>
+                    
+                    <div class="history-body p-3">
+                        {% for ct in don.chitietdonhang_set.all %}
+                        <div class="d-flex gap-3 py-3 border-bottom">
+                            {% if ct.san_pham.hinh_anh %}
+                                <img src="{{ ct.san_pham.hinh_anh.url }}" 
+                                     class="history-img rounded" alt="">
+                            {% endif %}
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">{{ ct.san_pham.ten_san_pham }}</h6>
+                                <small class="text-muted">
+                                    SL: {{ ct.so_luong }} × {{ ct.gia|floatformat:0 }} ₫
+                                </small>
+                            </div>
+                            <div class="text-end">
+                                <button onclick="yeuCauHoanTien({{ don.id }}, {{ ct.san_pham.id }}, '{{ ct.san_pham.ten_san_pham|escapejs }}')" 
+                                        class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-undo"></i> Yêu cầu hoàn tiền / Trả hàng
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="history-footer p-3 bg-light">
+                        <div>
+                            <strong>Tổng thanh toán:</strong> 
+                            <span class="text-danger fs-5">{{ don.tong_tien|floatformat:0 }} ₫</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-history fa-5x text-muted mb-4"></i>
+            <h5>Bạn chưa có đơn hàng nào</h5>
+            <a href="{% url 'danh_sach_san_pham' %}" class="btn btn-primary mt-3">
+                <i class="fas fa-shopping-bag"></i> Mua sắm ngay
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- ==================== MODAL YÊU CẦU HOÀN TIỀN ==================== -->
+<div class="modal fade" id="hoanTienModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content custom-modal">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold text-danger">
+                    <i class="fas fa-undo-alt me-2"></i>
+                    Yêu cầu hoàn tiền / Trả hàng
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body">
+                <div id="modal-product-info" class="mb-4 p-3 bg-light rounded-3 border"></div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Lý do <span class="text-danger">*</span></label>
+                    <select id="lyDo" class="form-select form-select-lg">
+                        <option value="">Chọn lý do hoàn tiền...</option>
+                        <option value="Sản phẩm lỗi">Sản phẩm bị lỗi, hỏng</option>
+                        <option value="Không đúng mô tả">Không đúng mô tả trên website</option>
+                        <option value="Không vừa size">Không vừa size / Sai màu sắc</option>
+                        <option value="Đổi ý">Đổi ý, không còn nhu cầu</option>
+                        <option value="Khác">Lý do khác</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Mô tả chi tiết</label>
+                    <textarea id="moTa" class="form-control" rows="4" 
+                              placeholder="Vui lòng mô tả rõ vấn đề bạn đang gặp phải..."></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Hình ảnh minh họa (nếu có)</label>
+                    <input type="file" id="hinhAnh" class="form-control" accept="image/*">
+                    <small class="text-muted d-block mt-1">JPG, PNG (tối đa 5MB)</small>
+                </div>
+            </div>
+
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" onclick="guiYeuCauHoanTien()" 
+                        class="btn btn-danger px-4" id="btnGuiYeuCau">
+                    <i class="fas fa-paper-plane me-2"></i> Gửi yêu cầu
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/lich_su_don_hang.js' %}"></script>
+{% endblock %}

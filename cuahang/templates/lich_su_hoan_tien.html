@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Lịch Sử Hoàn Tiền - OutfitLab{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/lich_su_hoan_tien.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="margin-top: 130px;">
+    
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h2 class="fw-bold text-pink mb-0">
+                <i class="fas fa-history"></i> Lịch Sử Hoàn Tiền / Trả Hàng
+            </h2>
+            <p class="text-muted">Quản lý tất cả yêu cầu hoàn tiền của bạn</p>
+        </div>
+        <a href="{% url 'lich_su_don_hang' %}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left"></i> Quay về Lịch sử Đơn hàng
+        </a>
+    </div>
+
+    {% if yeu_cau_list %}
+        <div class="row g-4">
+            {% for yc in yeu_cau_list %}
+            <div class="col-12">
+                <div class="refund-card">
+                    <div class="refund-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong class="fs-5">#{{ yc.don_hang.id }}</strong>
+                            <span class="ms-3">{{ yc.san_pham.ten_san_pham }}</span>
+                        </div>
+                        <span class="status-badge status-{{ yc.trang_thai }}">
+                            {{ yc.get_trang_thai_display }}
+                        </span>
+                    </div>
+                    
+                    <div class="refund-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <p><strong><i class="fas fa-info-circle"></i> Lý do:</strong> {{ yc.ly_do }}</p>
+                                <p class="mb-0"><strong>Mô tả:</strong></p>
+                                <p class="text-muted">{{ yc.mo_ta|default:"Không có mô tả" }}</p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <small class="text-muted d-block">
+                                    <i class="fas fa-clock"></i> 
+                                    {{ yc.ngay_yeu_cau|date:"d/m/Y H:i" }}
+                                </small>
+                            </div>
+                        </div>
+
+                        {% if yc.hinh_anh %}
+                            <div class="mt-4">
+                                <img src="{{ yc.hinh_anh.url }}" 
+                                     class="image-preview img-fluid w-100" 
+                                     alt="Hình ảnh minh họa">
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="refund-footer text-end">
+                        {% if yc.ngay_xu_ly %}
+                            <small class="text-muted">
+                                <i class="fas fa-check-circle"></i> 
+                                Đã xử lý: {{ yc.ngay_xu_ly|date:"d/m/Y" }}
+                            </small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5 empty-state">
+            <i class="fas fa-history fa-5x text-muted mb-4"></i>
+            <h5>Bạn chưa có yêu cầu hoàn tiền nào</h5>
+            <a href="{% url 'lich_su_don_hang' %}" class="btn btn-primary mt-3">
+                <i class="fas fa-arrow-left"></i> Quay về Lịch sử Đơn hàng
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/lich_su_hoan_tien.js' %}"></script>
+{% endblock %}

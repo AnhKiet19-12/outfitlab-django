@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Trang Chủ - Thời Trang VN{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/trangchu.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Background Slider -->
+<div class="hero-slider">
+    <div class="slide" style="background-image: url('{% static 'images/fashion1.png' %}');"></div>
+    <div class="slide" style="background-image: url('{% static 'images/fashion2.png' %}');"></div>
+    <div class="slide" style="background-image: url('{% static 'images/fashion3.png' %}');"></div>
+    <div class="overlay"></div>
+    
+    <div class="hero-content text-center">
+        <h1 class="display-3 fw-bold text-white">Phong Cách Riêng Của Bạn</h1>
+        <p class="lead text-white mb-4">Khám phá bộ sưu tập quần áo, giày dép & phụ kiện cao cấp</p>
+        <a href="{% url 'danh_sach_san_pham' %}" class="btn btn-light btn-lg px-5">Mua Sắm Ngay</a>
+    </div>
+</div>
+
+<!-- Sản phẩm nổi bật -->
+<div class="container my-5">
+    <h2 class="text-center mb-5">Sản Phẩm Nổi Bật</h2>
+    <div class="row g-4">
+        {% for sp in san_pham_noi_bat %}
+        <div class="col-md-3 col-6">
+            <div class="card product-card h-100 position-relative">
+                <!-- Badge Bán chạy -->
+                {% if sp.luot_mua >= 10 %}
+                <span class="badge bg-danger position-absolute top-0 start-0 m-2">🔥 Bán chạy</span>
+                {% endif %}
+
+                <a href="{% url 'chi_tiet_san_pham' sp.pk %}">
+                    {% if sp.hinh_anh %}
+                        <img src="{{ sp.hinh_anh.url }}" class="card-img-top" alt="{{ sp.ten_san_pham }}">
+                    {% endif %}
+                </a>
+                
+                <div class="card-body d-flex flex-column p-3">
+                    <h6 class="card-title text-truncate">{{ sp.ten_san_pham }}</h6>
+                    
+                    <!-- Giá -->
+                    <p class="text-danger fw-bold fs-5 mb-1">
+                        {% if sp.gia_min == sp.gia_max %}
+                            {{ sp.gia_min|floatformat:0 }} ₫
+                        {% else %}
+                            {{ sp.gia_min|floatformat:0 }} - {{ sp.gia_max|floatformat:0 }} ₫
+                        {% endif %}
+                    </p>
+                    
+                    <!-- Đánh giá + Lượt mua -->
+                    <div class="d-flex justify-content-between align-items-center small mb-3">
+                        <div>
+                            {% if sp.avg_rating > 0 %}
+                                <span class="text-warning">★</span>
+                                <span class="fw-medium ms-1">{{ sp.avg_rating }}/5</span>
+                                <span class="text-muted">({{ sp.tong_danh_gia }})</span>
+                            {% else %}
+                                <span class="text-muted">Chưa có đánh giá</span>
+                            {% endif %}
+                        </div>
+                        {% if sp.luot_mua > 0 %}
+                        <div class="text-muted small">
+                            {{ sp.luot_mua }} đã bán
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mt-auto">
+                        <a href="{% url 'chi_tiet_san_pham' sp.pk %}" class="btn btn-outline-primary btn-sm w-100 mb-2">Xem chi tiết</a>
+                        <a href="{% url 'chi_tiet_san_pham' sp.pk %}" class="btn btn-success btn-sm w-100">
+                            <i class="fas fa-cart-plus"></i> Chọn mua
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/trangchu.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Thanh Toán - OutfitLab{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/thanh_toan.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="margin-top: 130px;">
+    <div class="row">
+        <div class="col-lg-7">
+            <h2 class="mb-4 fw-bold text-pink">
+                <i class="fas fa-credit-card"></i> Thanh Toán
+            </h2>
+            
+            <!-- Địa chỉ giao hàng -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-map-marker-alt"></i> Địa chỉ giao hàng</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="checkoutForm">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Họ và tên người nhận</label>
+                                <input type="text" name="ho_ten_nhan" class="form-control" value="{{ user.ho_ten }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Số điện thoại</label>
+                                <input type="text" name="so_dien_thoai_nhan" class="form-control" value="{{ user.so_dien_thoai }}" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Địa chỉ chi tiết</label>
+                                <textarea name="dia_chi_giao" class="form-control" rows="3" required>{{ user.dia_chi }}</textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Sản phẩm -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Sản phẩm ({{ gio_hang|length }})</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% for item in gio_hang %}
+                    <div class="order-item p-3 border-bottom">
+                        <div class="d-flex align-items-center">
+                            {% if item.san_pham.hinh_anh %}
+                                <img src="{{ item.san_pham.hinh_anh.url }}" class="order-img me-3" alt="">
+                            {% endif %}
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">{{ item.san_pham.ten_san_pham }}</h6>
+                                <small class="text-muted">SL: {{ item.so_luong }} × {{ item.bien_the.gia|floatformat:0 }} ₫</small>
+                            </div>
+                            <div class="text-end">
+                                <strong class="text-danger">{{ item.thanh_tien|floatformat:0 }} ₫</strong>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Phương thức thanh toán -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Chọn phương thức thanh toán</h5>
+                </div>
+                <div class="card-body">
+                    <div class="payment-methods">
+                        <label class="payment-option active" data-method="bank">
+                            <input type="radio" name="payment_method" value="bank" checked>
+                            <i class="fas fa-university fa-2x text-primary"></i>
+                            <div><strong>Chuyển khoản ngân hàng (ZaloPay)</strong></div>
+                        </label>
+
+                        <label class="payment-option" data-method="cod">
+                            <input type="radio" name="payment_method" value="cod">
+                            <i class="fas fa-truck fa-2x text-warning"></i>
+                            <div>
+                                <strong>Thanh toán khi nhận hàng (COD)</strong>
+                                <small>Trả tiền mặt khi giao hàng</small>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cột phải -->
+        <div class="col-lg-5">
+            <div class="checkout-summary card shadow-sm sticky-top" style="top: 140px;">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-4">Tóm tắt thanh toán</h5>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Voucher Giảm Giá</label>
+                        <select id="voucher_giamgia" class="form-select" onchange="tinhTienThanhToan()">
+                            <option value="">Không dùng voucher giảm giá</option>
+                            {% for uv in vouchers %}
+                                {% if uv.khuyen_mai.loai_giam != 'freeship' %}
+                                <option value="{{ uv.khuyen_mai.ma_khuyen_mai }}" 
+                                        data-type="{{ uv.khuyen_mai.loai_giam }}"
+                                        data-value="{{ uv.khuyen_mai.gia_tri }}">
+                                    {{ uv.khuyen_mai.ten_khuyen_mai }}
+                                </option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Voucher Freeship</label>
+                        <select id="voucher_freeship" class="form-select" onchange="tinhTienThanhToan()">
+                            <option value="">Không dùng freeship</option>
+                            {% for uv in vouchers %}
+                                {% if uv.khuyen_mai.loai_giam == 'freeship' %}
+                                <option value="{{ uv.khuyen_mai.ma_khuyen_mai }}" 
+                                        data-type="freeship"
+                                        data-value="{{ uv.khuyen_mai.gia_tri }}">
+                                    {{ uv.khuyen_mai.ten_khuyen_mai }}
+                                </option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="summary-detail">
+                        <div class="summary-row">
+                            <span>Tạm tính:</span>
+                            <span id="tam_tinh">{{ tong_tien|floatformat:0 }} ₫</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Phí vận chuyển:</span>
+                            <span id="phi_ship_display" class="text-muted">30.000 ₫</span>
+                        </div>
+                        <div id="giam_gia_row" class="summary-row text-success" style="display: none;">
+                            <span>Giảm giá:</span>
+                            <span id="giam_gia_amount">-0 ₫</span>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="summary-row fs-4 fw-bold">
+                        <span>Tổng thanh toán:</span>
+                        <span id="tong_thanh_toan" class="text-danger">{{ tong_tien|floatformat:0 }} ₫</span>
+                    </div>
+
+                    <button id="btnThanhToan" class="btn btn-primary btn-lg w-100 mt-4 py-3 fw-bold">
+                        <i class="fas fa-lock me-2"></i> XÁC NHẬN & THANH TOÁN
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- NÚT XÁC NHẬN ĐÃ THANH TOÁN (HIỆN SAU KHI QUAY VỀ TỪ ZALOPAY) -->
+<div class="text-center mt-5">
+    <button onclick="xacNhanDaThanhToan()" 
+            class="btn btn-success btn-lg px-5 py-3 fw-bold">
+        <i class="fas fa-check-circle"></i> Tôi đã thanh toán thành công
+    </button>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/thanh_toan.js' %}"></script>
+{% endblock %}
