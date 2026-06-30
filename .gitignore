@@ -1,0 +1,28 @@
+# Virtual Environment
+venv/
+__pycache__/
+*.pyc
+
+# Database
+*.sqlite3
+*.db
+
+# Environment variables
+.env
+
+# Media files
+media/
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Django
+*.mo
+*.pot
+
+# Static & collected files
+staticfiles/
