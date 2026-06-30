@@ -29,7 +29,7 @@
 
                         <!-- Avatar + Hạng Thành Viên -->
                         <div class="text-center mb-5">
-                            <div class="position-relative d-inline-block" id="avatarWrapper">
+                            <div class="position-relative d-inline-block" id="avatarWrapper" style="cursor: pointer;">
                                 <img id="avatarImage" 
                                      src="{% if user.avatar %}{{ user.avatar.url }}{% else %}{% static 'images/avatar/macdinh.png' %}{% endif %}" 
                                      alt="Avatar" 
@@ -62,7 +62,8 @@
                                 </div>
                             </div>
 
-                            <input type="file" id="id_avatar" name="avatar" style="display: none;">
+                            <!-- Input file từ Django Form -->
+                            {{ form.avatar }}
                             <input type="hidden" id="delete_avatar" name="delete_avatar" value="false">
 
                             <h4 class="mt-3 mb-1 fw-bold" style="color: {{ current_hang.mau }};">
@@ -129,7 +130,7 @@
 <script>
     const defaultAvatarUrl = "{% static 'images/avatar/macdinh.png' %}";
     
-    // Khởi tạo tooltip cho badge hạng thành viên
+    // Khởi tạo tooltip
     document.addEventListener('DOMContentLoaded', function() {
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         tooltipTriggerList.map(function (tooltipTriggerEl) {

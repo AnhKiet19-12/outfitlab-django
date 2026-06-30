@@ -54,9 +54,14 @@ def dang_ky(request):
             return render(request, 'dang_ky.html')
 
         user = NguoiDung.objects.create_user(
-            username=username, email=email, password=password,
-            ho_ten=ho_ten, so_dien_thoai=so_dien_thoai
+            username=username, 
+            email=email, 
+            password=password,
+            ho_ten=ho_ten, 
+            so_dien_thoai=so_dien_thoai,
+            avatar='avatars/macdinh.png'   
         )
+        
         messages.success(request, 'Đăng ký thành công! Vui lòng đăng nhập.')
         return redirect('dang_nhap')
 
