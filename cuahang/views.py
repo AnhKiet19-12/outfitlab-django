@@ -70,14 +70,31 @@ def dang_ky(request):
 
 def dang_nhap(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        
         user = authenticate(username=username, password=password)
+        
         if user:
             login(request, user)
-            return redirect('trang_chu')
+            
+            # Xử lý next URL (từ admin hoặc trang khác)
+            next_url = request.GET.get('next')
+            
+            # Nếu là Staff/Admin → ưu tiên vào Admin
+            if user.is_staff or user.is_superuser:
+                messages.success(request, f'🎉 Đăng nhập Admin thành công - {user.username}')
+                if next_url and next_url.startswith('/admin'):
+                    return redirect(next_url)
+                return redirect('/admin/')  # hoặc 'admin:index'
+            
+            # User thường
+            messages.success(request, 'Đăng nhập thành công!')
+            return redirect(next_url or 'trang_chu')
+        
         else:
-            messages.error(request, 'Sai tên tài khoản hoặc mật khẩu!')
+            messages.error(request, '❌ Sai tên tài khoản hoặc mật khẩu!')
+    
     return render(request, 'dang_nhap.html')
 
 
@@ -797,11 +814,7 @@ def zalopay_callback(request):
     return HttpResponse("OK")
 
 # ====================== LỊCH SỬ & PROFILE ======================
-@login_required
-def lich_su_don_hang(request):
-    don = DonHang.objects.filter(nguoi_dung=request.user).order_by('-ngay_dat')
-    return render(request, 'lich_su_don_hang.html', {'don_hang': don})
-
+# ====================== ĐƠN HÀNG CỦA TÔI (Đang xử lý) ======================
 @login_required
 def don_hang_cua_toi(request):
     don_chua_giao = DonHang.objects.filter(
@@ -813,15 +826,33 @@ def don_hang_cua_toi(request):
         'don_chua_giao': don_chua_giao
     })
 
+
+# ====================== XÁC NHẬN ĐÃ NHẬN HÀNG ======================
 @login_required
 def xac_nhan_nhan_hang(request, don_id):
     if request.method == 'POST':
         don = get_object_or_404(DonHang, id=don_id, nguoi_dung=request.user)
-        don.trang_thai = 'da_giao'
-        don.save()
-        return JsonResponse({'success': True})
+        
+        # Chỉ cho phép xác nhận khi đơn đang ở trạng thái 'dang_giao'
+        if don.trang_thai == 'dang_giao':
+            don.trang_thai = 'da_giao'
+            don.save()
+            return JsonResponse({'success': True, 'message': 'Đã xác nhận nhận hàng thành công!'})
+        else:
+            return JsonResponse({'success': False, 'message': 'Không thể xác nhận đơn hàng này.'}, status=400)
+    
     return JsonResponse({'success': False}, status=400)
 
+
+# ====================== LỊCH SỬ ĐƠN HÀNG (Đã hoàn thành) ======================
+@login_required
+def lich_su_don_hang(request):
+    don = DonHang.objects.filter(
+        nguoi_dung=request.user,
+        trang_thai__in=['da_giao', 'da_huy']
+    ).prefetch_related('chitietdonhang_set__san_pham').order_by('-ngay_dat')
+    
+    return render(request, 'lich_su_don_hang.html', {'don_hang': don})
 # ====================== ADMIN DASHBOARD ======================
 @login_required
 def admin_dashboard(request):

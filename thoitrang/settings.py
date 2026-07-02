@@ -85,6 +85,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'thoitrang.wsgi.application'
 
 
+
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
@@ -106,6 +107,18 @@ DATABASES = {
     }
 }
 
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
+    # Middleware mới - Xử lý phân biệt User & Admin
+    'cuahang.middleware.AdminStaffMiddleware',
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -136,6 +149,19 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
+
+# ====================== ADMIN CONFIG ======================
+ADMIN_URL = 'admin/'  # giữ nguyên nếu muốn
+
+# Cho phép staff user truy cập admin dễ dàng hơn
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
+# Tùy chọn: Redirect staff user sau khi login
+def custom_login_redirect(user):
+    if user.is_staff:
+        return '/admin/'
+    return '/'
 
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
